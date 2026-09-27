@@ -23,6 +23,9 @@ class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
             layout.label(text="Valid armature selected")
         else:
             layout.label(text="Please select an armature")
+        
+        bone_count = len(obj.data.bones)
+        layout.label(text=f"There are {bone_count} bones")
 
 
 classes = (
