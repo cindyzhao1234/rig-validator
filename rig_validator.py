@@ -22,6 +22,14 @@ def printBones(bones):
             if usesDeform(bone):
                 print(f"{bone.name} uses deform\n")
 
+def checkSymmetry(bones):
+    for bone in bones:
+        if bone.name.endswith(".L"):
+            right_name = bone.name[:-2] + ".R"
+            if right_name in bones:
+                print(f"{bone.name} has matching {right_name}")
+            else: print(f"{bone.name} is missing {right_name}")
+
 def usesDeform(bone):
     return bone.use_deform
 
@@ -43,7 +51,7 @@ class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
             layout.label(text="Valid armature selected")
             bone_count = boneCount(obj)
             layout.label(text=f"There are {bone_count} bones")
-            printBones(obj.data.bones)
+            checkSymmetry(obj.data.bones)
         else:
             layout.label(text="Select valid armature")
 
