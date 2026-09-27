@@ -5,6 +5,26 @@ import bpy
 def isArmature(obj):
     return obj and obj.type == 'ARMATURE'
 
+def boneCount(obj) -> int:
+    bone_count = len(obj.data.bones)
+    return bone_count
+    
+def printBones(bones):
+    for bone in bones:
+        if bone.parent:
+            print(f"{bone.name}, parent: {bone.parent.name}")
+            if usesDeform(bone):
+                print(f"{bone.name} uses deform\n")
+            else:
+                print(f"{bone.name} does not use deform\n")
+        else:
+            print(bone.name)
+            if usesDeform(bone):
+                print(f"{bone.name} uses deform\n")
+
+def usesDeform(bone):
+    return bone.use_deform
+
 class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
     bl_label = "Rig Validator"
     bl_idname = "RIGVALIDATOR_PT_main_panel"
@@ -21,11 +41,11 @@ class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
 
         if isArmature(obj):
             layout.label(text="Valid armature selected")
+            bone_count = boneCount(obj)
+            layout.label(text=f"There are {bone_count} bones")
+            printBones(obj.data.bones)
         else:
-            layout.label(text="Please select an armature")
-        
-        bone_count = len(obj.data.bones)
-        layout.label(text=f"There are {bone_count} bones")
+            layout.label(text="Select valid armature")
 
 
 classes = (
