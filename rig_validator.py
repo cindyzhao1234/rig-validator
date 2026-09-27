@@ -1,6 +1,10 @@
 import bpy
 
 
+    
+def isArmature(obj):
+    return obj and obj.type == 'ARMATURE'
+
 class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
     bl_label = "Rig Validator"
     bl_idname = "RIGVALIDATOR_PT_main_panel"
@@ -12,7 +16,13 @@ class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
         layout = self.layout
 
         layout.label(text="Rig Validator")
-        layout.label(text="Select an armature to begin.")
+        
+        obj = bpy.context.active_object
+
+        if isArmature(obj):
+            layout.label(text="Valid armature selected")
+        else:
+            layout.label(text="Please select an armature")
 
 
 classes = (
