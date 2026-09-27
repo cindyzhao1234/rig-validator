@@ -1,0 +1,13 @@
+# Blender backup files
+*.blend1
+*.blend2
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
