@@ -1,6 +1,4 @@
 import bpy
-
-
     
 def isArmature(obj):
     return obj and obj.type == 'ARMATURE'
@@ -22,13 +20,98 @@ def printBones(bones):
             if usesDeform(bone):
                 print(f"{bone.name} uses deform\n")
 
-def checkSymmetry(bones):
+def remove_side(name):
+    #Remove .L or .R suffix from a bone name.
+    if name.endswith((".L", ".R")):
+        return name[:-2]
+    return name
+
+
+def checkSymmetry(bones, layout):
+    has_name_symmetry = True
+    has_parent_symmetry = True
+    has_length_symmetry = True
+    has_deform_symmetry = True
+
     for bone in bones:
-        if bone.name.endswith(".L"):
-            right_name = bone.name[:-2] + ".R"
-            if right_name in bones:
-                print(f"{bone.name} has matching {right_name}")
-            else: print(f"{bone.name} is missing {right_name}")
+
+        if not bone.name.endswith(".L"):
+            continue
+
+        right_name = bone.name[:-2] + ".R"
+
+        #CHECK MATCHING BONES EXIST
+        if right_name not in bones:
+            print(f"{bone.name} is missing {right_name}")
+            has_name_symmetry = False
+            continue
+
+        right_bone = bones[right_name]
+
+        print(f"{bone.name} has matching {right_name}")
+
+        #CHECK MATCHING BONES HAVE MATCHING PARENTS
+        #Both have parents
+        if bone.parent and right_bone.parent:
+
+            left_parent = remove_side(bone.parent.name)
+            right_parent = remove_side(right_bone.parent.name)
+
+            if left_parent != right_parent:
+                print(
+                    f"{bone.name} and {right_name} "
+                    f"have different parents"
+                )
+                has_parent_symmetry = False
+
+        #Only one has a parent
+        elif bone.parent or right_bone.parent:
+            print(
+                f"{bone.name} and {right_name} "
+                f"have different parent structures"
+            )
+            has_parent_symmetry = False
+
+
+        #CHECK LENGTH OF MATCHING BONES
+        if round(bone.length, 5) != round(right_bone.length, 5):
+            print(
+                f"{bone.name}: {bone.length} | "
+                f"{right_name}: {right_bone.length}"
+            )
+            has_length_symmetry = False
+        
+        #CHECK IF MATCHING BONES HAVE MATCHING DEFORM SETTINGS
+        if bone.use_deform == right_bone.use_deform:
+            print(f"{bone.name} and {right_bone.name} have matching deform settings")
+        else:
+            if bone.use_deform == True and right_bone.use_deform == False:
+                print(f"{bone.name} uses deform but {right_bone.name} does not")
+            elif bone.use_deform == False and right_bone.use_deform == True:
+                print(f"{bone.name} does not use deform but {right_bone.name} uses deform")
+            has_deform_symmetry = False
+
+
+    if has_name_symmetry:
+        layout.label(text="✓ Name symmetry")
+    else:
+        layout.label(text="x Name symmetry")
+
+    if has_parent_symmetry:
+        layout.label(text="✓ Parent symmetry")
+    else:
+        layout.label(text="x Parent symmetry")
+
+    if has_length_symmetry:
+        layout.label(text="✓ Length symmetry")
+    else:
+        layout.label(text="x Length symmetry")
+        
+    if has_deform_symmetry:
+        layout.label(text="✓ Deform symmetry")
+    else:
+        layout.label(text="x Deform symmetry")
+
 
 def usesDeform(bone):
     return bone.use_deform
@@ -51,7 +134,7 @@ class RIGVALIDATOR_PT_main_panel(bpy.types.Panel):
             layout.label(text="Valid armature selected")
             bone_count = boneCount(obj)
             layout.label(text=f"There are {bone_count} bones")
-            checkSymmetry(obj.data.bones)
+            checkSymmetry(obj.data.bones, layout)
         else:
             layout.label(text="Select valid armature")
 
