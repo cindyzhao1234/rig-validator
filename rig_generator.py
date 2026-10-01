@@ -51,6 +51,7 @@ hand = createBone("hand.L", arm002, None, (0.83, 0, 1.39), True)
 leg001 = createBone("leg001.L", pelvis_bone, (0.1, -0.01, 0.85), (0.12, 0, 0.47), False)
 leg002 = createBone("leg002.L", leg001, None, (0.15, 0.06, 0.05), True)
 
+foot = createBone("foot.L", leg002, None, (0.16, -0.07, 0), True)
 
 for bone in bones:
     if bone.name.endswith(".L"):
