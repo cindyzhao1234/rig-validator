@@ -17,16 +17,45 @@ bpy.ops.object.mode_set(mode="EDIT") #enter edit mode
 
 bones = armature_data.edit_bones #the collection of bones we are allowed to edit
 
-root_bone = bones.new("root bone") #new bone
+#helper function to create a bone
+def createBone(name, parent, head, tail, connected):
+    bone = bones.new(name)
+    bone.parent = parent
+    bone.tail = tail
+    
+    if connected:
+        bone.head = parent.tail
+    else:
+        bone.head = head
 
-#give coordinates for head and tail of bone
-root_bone.head = (0, 0, 0)
-root_bone.tail = (0, 0, 0.5)
+    if parent == None:
+        bone.use_connect = False
+    else:
+        bone.use_connect = connected
 
-pelvis_bone = bones.new("pelvis bone")
-pelvis_bone.head = (0, 0, 0.85)
-pelvis_bone.tail = (0, 0, 1.0)
+    return bone
 
-#set the parent of the pelvis_bone to root_bone
-pelvis_bone.parent = root_bone
-pelvis_bone.use_connect = False
+
+root = createBone("root", None, (0, 0, 0), (0, 0, 0.5), False)
+pelvis_bone = createBone("pelvis_bone", root, (0, 0, 0.85), (0, -0.05, 1.05), False)
+spine001 = createBone("spine001", pelvis_bone, None, (0, -0.04, 1.25), True)
+spine002 = createBone("spine002", spine001, None, (0, -0.01, 1.45), True)
+neck = createBone("neck", spine002, None, (0, -0.04, 1.55), True)
+head = createBone("head", neck, None, (0, -0.1, 1.75), True)
+
+shoulder_L = createBone("shoulder.L", spine002, (0.05, 0, 1.45), (0.18, 0.01, 1.41), False)
+arm001 = createBone("arm001.L", shoulder_L, None, (0.43, 0.03, 1.40), True)
+arm002 = createBone("arm002.L", arm001, None, (0.66, 0.02, 1.41), True)
+hand = createBone("hand.L", arm002, None, (0.83, 0, 1.39), True)
+
+leg001 = createBone("leg001.L", pelvis_bone, (0.1, -0.01, 0.85), (0.12, 0, 0.47), False)
+leg002 = createBone("leg002.L", leg001, None, (0.15, 0.06, 0.05), True)
+
+
+for bone in bones:
+    if bone.name.endswith(".L"):
+        bone.select = True
+        bone.select_head = True
+        bone.select_tail = True
+
+bpy.ops.armature.symmetrize(direction='POSITIVE_X', copy_bone_colors=False)
