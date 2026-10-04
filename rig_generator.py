@@ -59,4 +59,26 @@ for bone in bones:
         bone.select_head = True
         bone.select_tail = True
 
+#symmetrise the left to the right 
 bpy.ops.armature.symmetrize(direction='POSITIVE_X', copy_bone_colors=False)
+
+bpy.ops.object.mode_set(mode="OBJECT") #enter object mode
+
+#select mesh first then rig
+body_mesh = bpy.data.objects["MainBody"]
+head_mesh = bpy.data.objects["Head"]
+lash_mesh = bpy.data.objects["head_eyelashes"]
+eyes_mesh = bpy.data.objects["head_eyes"]
+teeth_mesh = bpy.data.objects["head_teeth"]
+
+body_mesh.select_set(True)
+head_mesh.select_set(True)
+lash_mesh.select_set(True)
+eyes_mesh.select_set(True)
+teeth_mesh.select_set(True)
+
+#make the rig the main target selection
+bpy.context.view_layer.objects.active = rig
+
+#connect
+bpy.ops.object.parent_set(type='ARMATURE_AUTO')
