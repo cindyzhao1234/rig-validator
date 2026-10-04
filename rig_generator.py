@@ -1,4 +1,5 @@
 import bpy
+import math
 
 #create new armature data
 armature_data = bpy.data.armatures.new("NewArmatureData")
@@ -57,6 +58,8 @@ foot = createBone("foot.L", leg002, None, (0.16, -0.07, 0), True)
 
 foot_IK = createBone("foot-IK.L", root, leg002.tail, (0.15, 0.2, 0.05), False, False)
 
+knee_pole = createBone("knee_pole.L", root, (0.12, -0.3, 0.47), (0.12, -0.5, 0.47), False, False)
+
 
 for bone in bones:
     if bone.name.endswith(".L"):
@@ -76,6 +79,9 @@ shin_pose_L = rig.pose.bones["leg002.L"]
 ik_L = shin_pose_L.constraints.new("IK")
 ik_L.target = rig
 ik_L.subtarget = "foot-IK.L"
+ik_L.pole_target = rig
+ik_L.pole_subtarget = "knee_pole.L"
+ik_L.pole_angle = math.radians(-90)
 ik_L.chain_count = 2
 
 shin_pose_R = rig.pose.bones["leg002.R"]
@@ -84,6 +90,9 @@ shin_pose_R = rig.pose.bones["leg002.R"]
 ik_R = shin_pose_R.constraints.new("IK")
 ik_R.target = rig
 ik_R.subtarget = "foot-IK.R"
+ik_R.pole_target = rig
+ik_R.pole_subtarget = "knee_pole.R"
+ik_R.pole_angle = math.radians(-90)
 ik_R.chain_count = 2
 
 
