@@ -18,7 +18,7 @@ bpy.ops.object.mode_set(mode="EDIT") #enter edit mode
 bones = armature_data.edit_bones #the collection of bones we are allowed to edit
 
 #helper function to create a bone
-def createBone(name, parent, head, tail, connected):
+def createBone(name, parent, head, tail, connected, deform = True):
     bone = bones.new(name)
     bone.parent = parent
     bone.tail = tail
@@ -32,6 +32,8 @@ def createBone(name, parent, head, tail, connected):
         bone.use_connect = False
     else:
         bone.use_connect = connected
+    
+    bone.use_deform = deform
 
     return bone
 
@@ -53,6 +55,9 @@ leg002 = createBone("leg002.L", leg001, None, (0.15, 0.06, 0.05), True)
 
 foot = createBone("foot.L", leg002, None, (0.16, -0.07, 0), True)
 
+foot_IK = createBone("foot-IK.L", root, leg002.tail, (0.15, 0.2, 0.05), False, False)
+
+
 for bone in bones:
     if bone.name.endswith(".L"):
         bone.select = True
@@ -61,6 +66,27 @@ for bone in bones:
 
 #symmetrise the left to the right 
 bpy.ops.armature.symmetrize(direction='POSITIVE_X', copy_bone_colors=False)
+
+#add constraint to left foot ik
+bpy.ops.object.mode_set(mode="POSE")
+#select pose version of the shin bone
+shin_pose_L = rig.pose.bones["leg002.L"]
+
+#add ik constraint:
+ik_L = shin_pose_L.constraints.new("IK")
+ik_L.target = rig
+ik_L.subtarget = "foot-IK.L"
+ik_L.chain_count = 2
+
+shin_pose_R = rig.pose.bones["leg002.R"]
+
+#add ik constraint:
+ik_R = shin_pose_R.constraints.new("IK")
+ik_R.target = rig
+ik_R.subtarget = "foot-IK.R"
+ik_R.chain_count = 2
+
+
 
 bpy.ops.object.mode_set(mode="OBJECT") #enter object mode
 
