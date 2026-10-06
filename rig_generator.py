@@ -72,6 +72,7 @@ bpy.ops.armature.symmetrize(direction='POSITIVE_X', copy_bone_colors=False)
 
 #add constraint to left foot ik
 bpy.ops.object.mode_set(mode="POSE")
+
 #select pose version of the shin bone
 shin_pose_L = rig.pose.bones["leg002.L"]
 
@@ -86,7 +87,6 @@ ik_L.chain_count = 2
 
 shin_pose_R = rig.pose.bones["leg002.R"]
 
-#add ik constraint:
 ik_R = shin_pose_R.constraints.new("IK")
 ik_R.target = rig
 ik_R.subtarget = "foot-IK.R"
